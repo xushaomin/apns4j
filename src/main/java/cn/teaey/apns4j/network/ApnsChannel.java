@@ -24,6 +24,7 @@ import cn.teaey.apns4j.network.async.ApnsFuture;
 import cn.teaey.apns4j.network.async.PayloadSender;
 import cn.teaey.apns4j.protocol.ApnsPayload;
 import cn.teaey.apns4j.protocol.ErrorResp;
+import cn.teaey.apns4j.utils.Contants;
 
 import javax.net.ssl.SSLSocket;
 import java.io.IOException;
@@ -69,12 +70,12 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
     private class CacheWapper {
         private final int id;
         private final byte[] deviceToken;
-        private final ApnsPayload apnsPayload;
+        private final String apnsPayloadJson;
 
-        private CacheWapper(int id, byte[] deviceToken, ApnsPayload apnsPayload) {
+        private CacheWapper(int id, byte[] deviceToken, String apnsPayloadJson) {
             this.id = id;
             this.deviceToken = deviceToken;
-            this.apnsPayload = apnsPayload;
+            this.apnsPayloadJson = apnsPayloadJson;
         }
 
         public int getId() {
@@ -85,8 +86,8 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
             return deviceToken;
         }
 
-        public ApnsPayload getApnsPayload() {
-            return apnsPayload;
+        public String getApnsPayload() {
+            return apnsPayloadJson;
         }
     }
 
@@ -139,7 +140,42 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
             }
         }
         if(!resent) {
-            payloadCache.put(payloadId, new CacheWapper(payloadId, deviceTokenBytes, apnsPayload));
+            payloadCache.put(payloadId, new CacheWapper(payloadId, deviceTokenBytes, jsonString));
+        }
+        return null;
+    }
+    
+    public ApnsFuture send(byte[] deviceTokenBytes, String apnsPayloadJson, int tryTimes, boolean resent) {
+    	checkClosed();
+        return this.send(deviceTokenBytes, apnsPayloadJson, tryTimes, Contants.expiry, resent);
+    }
+    
+    public ApnsFuture send(byte[] deviceTokenBytes, String apnsPayloadJson, int tryTimes, int expiry, boolean resent) {
+        if (tryTimes < 1) {
+            tryTimes = 1;
+        }
+        int payloadId = ApnsHelper.IDENTIFIER.incrementAndGet();
+        ApnsHelper.checkDeviceToken(deviceTokenBytes);
+        byte[] binaryData = ApnsHelper.toRequestBytes(deviceTokenBytes, apnsPayloadJson, payloadId, expiry);
+        for (int i = 1; i <= tryTimes; i++) {
+            try {
+                socket();
+                out().write(binaryData);
+                flush();
+                //log.debug("Success send payload : {} to device : {} try : {}", new Object[]{jsonString, deviceTokenBytes, i});
+                break;
+            } catch (IOException e) {
+                try {
+                    _close();
+                } catch (IOException e1) {
+                }
+                //log.error("Failed send payload : {} to device : {} try : {}", new Object[]{jsonString, deviceTokenBytes, e});
+                if (i == tryTimes)
+                    throw new ApnsException(e);
+            }
+        }
+        if(!resent) {
+            payloadCache.put(payloadId, new CacheWapper(payloadId, deviceTokenBytes, apnsPayloadJson));
         }
         return null;
     }
@@ -153,6 +189,11 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
     public ApnsFuture send(byte[] deviceTokenBytes, ApnsPayload apnsPayload) {
         checkClosed();
         return this.send(deviceTokenBytes, apnsPayload, tryTimes, false);
+    }
+    
+    public ApnsFuture send(byte[] deviceTokenBytes, String apnsPayloadJson) {
+        checkClosed();
+        return this.send(deviceTokenBytes, apnsPayloadJson, tryTimes, false);
     }
 
     /**
@@ -175,6 +216,11 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
      * @param apnsPayload       a {@link ApnsPayload} object.
      */
     public ApnsFuture send(String deviceTokenString, ApnsPayload apnsPayload) {
+        checkClosed();
+        return this.send(ApnsHelper.toByteArray(deviceTokenString), apnsPayload);
+    }
+    
+    public ApnsFuture send(String deviceTokenString, String apnsPayload) {
         checkClosed();
         return this.send(ApnsHelper.toByteArray(deviceTokenString), apnsPayload);
     }

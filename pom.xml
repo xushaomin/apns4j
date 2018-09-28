@@ -12,7 +12,7 @@
 
     <groupId>cn.teaey.apns4j</groupId>
     <artifactId>apns4j</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.4.APPLE</version>
     <packaging>jar</packaging>
     <url>https://github.com/teaey/apns4j.git</url>
     <name>Apns4j</name>
@@ -58,4 +58,18 @@
             </plugin>
         </plugins>
     </build>
+    
+    <distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<name>Local Nexus Releases Repository</name>
+			<url>http://nexus.appleframework.com:8081/nexus/content/repositories/releases</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>Local Nexus Snapshots Repository</name>
+			<url>http://nexus.appleframework.com:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
