@@ -23,6 +23,9 @@ package cn.teaey.apns4j.keystore;
  * @since 1.0.0
  */
 public class InvalidKeyStoreException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
+
     /**
      * <p>Constructor for InvalidKeyStoreException.</p>
      *

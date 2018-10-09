@@ -308,6 +308,15 @@ public class ApnsChannel implements Channel, PayloadSender<ApnsPayload> {
             throw new IllegalStateException("Channel closed, get a new channel from channel factory");
         }
     }
+    
+    public boolean isClosed() {
+        if (closed.get()) {
+            return true;
+        }
+        else {
+        	return false;
+        }
+    }
 
     /**
      * {@inheritDoc}

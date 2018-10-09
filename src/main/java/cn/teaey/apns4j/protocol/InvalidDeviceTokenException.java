@@ -23,6 +23,9 @@ package cn.teaey.apns4j.protocol;
  * @since 1.0.0
  */
 public class InvalidDeviceTokenException extends RuntimeException {
+	
+	private static final long serialVersionUID = 1L;
+
     /**
      * <p>Constructor for InvalidDeviceTokenException.</p>
      */

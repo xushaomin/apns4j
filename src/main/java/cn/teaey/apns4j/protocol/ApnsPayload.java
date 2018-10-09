@@ -153,7 +153,8 @@ public class ApnsPayload extends Payload {
      * @param args a {@link java.util.List} object.
      * @return ApnsPayload
      */
-    public ApnsPayload alertLocArgs(List args) {
+    @SuppressWarnings("rawtypes")
+	public ApnsPayload alertLocArgs(List args) {
         ensureAlertMap().put(ATTR_ALERT_LOC_ARGS, args);
         return this;
     }
@@ -169,7 +170,8 @@ public class ApnsPayload extends Payload {
         return this;
     }
 
-    private Map<String, Object> ensureAlertMap() {
+    @SuppressWarnings("unchecked")
+	private Map<String, Object> ensureAlertMap() {
         Object ret = apsDict.get(ATTR_ALERT);
         if (null == ret || ret instanceof String) {
             ret = new HashMap<String, Object>();

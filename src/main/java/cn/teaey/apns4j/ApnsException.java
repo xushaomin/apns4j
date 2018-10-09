@@ -22,7 +22,10 @@ package cn.teaey.apns4j;
  * @author xiaofei.wxf
  */
 public class ApnsException extends RuntimeException {
-    public ApnsException() {
+
+	private static final long serialVersionUID = 1L;
+
+	public ApnsException() {
     }
 
     public ApnsException(String message) {

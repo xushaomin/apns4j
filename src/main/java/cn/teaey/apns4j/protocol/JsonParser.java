@@ -27,6 +27,7 @@ import java.util.Map;
  * @since 1.0.0
  */
 public class JsonParser {
+	
     private static final char DOUBLE_QUOTE = '"';
     private static final char COLON = ':';
     private static final char BRACE_L = '{';

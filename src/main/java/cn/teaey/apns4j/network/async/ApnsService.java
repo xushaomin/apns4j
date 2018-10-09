@@ -35,9 +35,9 @@ public class ApnsService implements PayloadSender<ApnsPayload> {
     private final int size;
     private final ApnsChannelFactory apnsChannelFactory;
     private final ExecutorService executorService;
-    private final ExecutorService errorExecutor;
+    //private final ExecutorService errorExecutor;
     private final AtomicBoolean START = new AtomicBoolean(true);
-    private final int tryTimes;
+    //private final int tryTimes;
     private final ThreadLocal<PayloadSender<ApnsPayload>> threadSelfConnection = new ThreadLocal() {
         protected PayloadSender<ApnsPayload> initialValue() {
             return apnsChannelFactory.newChannel();
@@ -48,8 +48,8 @@ public class ApnsService implements PayloadSender<ApnsPayload> {
         this.size = (executorSize > processors) ? processors : executorSize;
         this.apnsChannelFactory = apnsChannelFactory;
         this.executorService = Executors.newFixedThreadPool(this.size);
-        this.errorExecutor = Executors.newFixedThreadPool(1);
-        this.tryTimes = tryTimes;
+        //this.errorExecutor = Executors.newFixedThreadPool(1);
+        //this.tryTimes = tryTimes;
     }
 
     public ApnsFuture send(String deviceToken, ApnsPayload payload) {
